@@ -129,14 +129,16 @@ def main():
     encrypted_path = "encrypted_text.txt"
     decrypted_path = "decrypted_text.txt"
 
-    encrypt_file(shift1, shift2, raw_path, encrypted_path)
-    print(f"Encrypted '{raw_path}' -> '{encrypted_path}'")
+    try:
+        encrypt_file(shift1, shift2, raw_path, encrypted_path)
+        print(f"Encrypted '{raw_path}' -> '{encrypted_path}'")
 
-    decrypt_file(shift1, shift2, encrypted_path, decrypted_path)
-    print(f"Decrypted '{encrypted_path}' -> '{decrypted_path}'")
+        decrypt_file(shift1, shift2, encrypted_path, decrypted_path)
+        print(f"Decrypted '{encrypted_path}' -> '{decrypted_path}'")
 
-    verify_files(raw_path, decrypted_path)
-
+        verify_files(raw_path, decrypted_path)
+    except FileNotFoundError as e:
+        print(f"Could not find file: {e.filename}. Make sure raw_text.txt is in the same folder as cipher.py.")
 
 if __name__ == "__main__":
-    main() Hahshir
+    main()
