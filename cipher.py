@@ -102,9 +102,12 @@ def verify_files(original_path: str, decrypted_path: str) -> bool:
     if success:
         print("Verification successful: decrypted text matches the original.")
     else:
+        mismatches = sum(1 for a, b in zip(original, decrypted) if a != b)
+        first_index = next((i for i, (a, b) in enumerate(zip(original, decrypted)) if a != b), None)
         print("Verification failed: decrypted text does NOT match the original.")
+        print(f"  {mismatches} character(s) differ (first difference at position {first_index}).")
+        print("  This happens when two different letters land on the same encrypted letter for this shift1/shift2 pair.")
     return success
-
 
 def _read_nonnegative_int(prompt: str) -> int:
     """Keeps asking until the user types a valid non-negative integer."""
