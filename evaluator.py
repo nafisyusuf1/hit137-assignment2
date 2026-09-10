@@ -407,6 +407,7 @@ def generate_report(entries):
     
     report["error_count"] = len(report["expressions_by_success"]["error"])
     report["success_count"] = len(report["expressions_by_success"]["success"])
+    report["statistics"] = gather_statistics(entries)
     
     return report
 
