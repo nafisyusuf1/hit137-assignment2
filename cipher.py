@@ -132,7 +132,7 @@ def verify_files(original_path: str, decrypted_path: str) -> bool:
         first_index = next((i for i, (a, b) in enumerate(zip(original, decrypted)) if a != b), min(len(original), len(decrypted)))
         print("Verification failed: decrypted text does NOT match the original.")
         print(f"  {mismatches} character(s) differ (first difference at position {first_index}).")
-        print("  This happens when two different letters land on the same encrypted letter for this shift1/shift2 pair.")
+        print("  Check that the same shift1/shift2 values were used for encryption and decryption.")
     return success
 
 def _read_nonnegative_int(prompt: str) -> int:
