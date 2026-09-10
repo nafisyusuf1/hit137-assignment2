@@ -562,7 +562,10 @@ def evaluate_file(input_path):
 def main():
     """Evaluate input.txt or a path supplied on the command line."""
     here = os.path.dirname(os.path.abspath(__file__))
-    input_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(here, "input.txt")
+    if len(sys.argv) > 2:
+        print("Usage: python evaluator.py [input_file]")
+        return
+    input_path = sys.argv[1] if len(sys.argv) == 2 else os.path.join(here, "input.txt")
 
     start = time.time()
     try:
