@@ -550,7 +550,11 @@ def main():
     input_path = os.path.join(here, "input.txt")
 
     start = time.time()
-    results = evaluate_file(input_path)
+    try:
+        results = evaluate_file(input_path)
+    except FileNotFoundError:
+        print("Could not find input.txt. Place it next to evaluator.py and run again.")
+        return
     elapsed = time.time() - start
 
     print("Processed " + str(len(results)) + " expression(s).")
