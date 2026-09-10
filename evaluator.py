@@ -562,6 +562,11 @@ def evaluate_file(input_path):
 def main():
     """Evaluate input.txt or a path supplied on the command line."""
     here = os.path.dirname(os.path.abspath(__file__))
+    if len(sys.argv) == 2 and sys.argv[1] in ("-h", "--help"):
+        print("Usage: python evaluator.py [input_file]")
+        print("Reads one mathematical expression per line.")
+        print("Default input: input.txt next to evaluator.py")
+        return
     if len(sys.argv) > 2:
         print("Usage: python evaluator.py [input_file]")
         return
