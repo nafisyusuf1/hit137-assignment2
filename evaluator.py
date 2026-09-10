@@ -29,6 +29,7 @@ Design notes
 """
 
 import os
+import sys
 import time
 import json
 
@@ -545,9 +546,9 @@ def evaluate_file(input_path):
 
 
 def main():
-    """Evaluate input.txt sitting next to this script."""
+    """Evaluate input.txt or a path supplied on the command line."""
     here = os.path.dirname(os.path.abspath(__file__))
-    input_path = os.path.join(here, "input.txt")
+    input_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(here, "input.txt")
 
     start = time.time()
     try:
