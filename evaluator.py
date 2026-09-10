@@ -472,7 +472,8 @@ def evaluate_file(input_path):
             try:
                 tokens, t = profile_operation("tokenize", tokenize, expression)
                 time_tokenize += t
-            except ValueError:
+            except ValueError as error:
+                entry["tokens"] = "ERROR (" + str(error) + ")"
                 cache[expression] = entry
                 entries.append(entry)
                 blocks.append(
@@ -490,8 +491,8 @@ def evaluate_file(input_path):
                 tree, t = profile_operation("parse", parse, tokens)
                 time_parse += t
                 entry["tree"] = tree_to_string(tree)
-            except (ValueError, IndexError):
-                entry["tree"] = "ERROR"
+            except (ValueError, IndexError) as error:
+                entry["tree"] = "ERROR (" + str(error) + ")"
                 cache[expression] = entry
                 entries.append(entry)
                 blocks.append(
