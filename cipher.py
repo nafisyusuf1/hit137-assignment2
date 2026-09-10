@@ -14,6 +14,9 @@ Design notes (read this before you present it to your group):
     which rule produced an encrypted character.
 """
 
+import sys
+
+
 ALPHABET_SIZE = 26
 DIGIT_SIZE = 10
 LOWER_FIRST_START = ord('a')
@@ -24,6 +27,16 @@ UPPER_FIRST_START = ord('A')
 UPPER_FIRST_SIZE = 13  # A-M
 UPPER_SECOND_START = ord('N')
 UPPER_SECOND_SIZE = 13  # N-Z
+
+
+def _validate_shifts(shift1: int, shift2: int) -> None:
+    """Reject shift values that cannot be used by the cipher."""
+    if not isinstance(shift1, int) or isinstance(shift1, bool):
+        raise TypeError("shift1 must be an integer")
+    if not isinstance(shift2, int) or isinstance(shift2, bool):
+        raise TypeError("shift2 must be an integer")
+    if shift1 < 0 or shift2 < 0:
+        raise ValueError("shift values must be non-negative")
 
 
 def shift_char_encrypt(ch, shift1, shift2):
@@ -72,11 +85,13 @@ def shift_char_decrypt(ch, shift1, shift2):
 
 def encrypt_text(text: str, shift1: int, shift2: int) -> str:
     """Return encrypted text without requiring temporary files."""
+    _validate_shifts(shift1, shift2)
     return ''.join(shift_char_encrypt(ch, shift1, shift2) for ch in text)
 
 
 def decrypt_text(text: str, shift1: int, shift2: int) -> str:
     """Return decrypted text without requiring temporary files."""
+    _validate_shifts(shift1, shift2)
     return ''.join(shift_char_decrypt(ch, shift1, shift2) for ch in text)
 
 
@@ -136,8 +151,21 @@ def _read_nonnegative_int(prompt: str) -> int:
 
 
 def main():
-    shift1 = _read_nonnegative_int("Enter shift1 (non-negative integer): ")
-    shift2 = _read_nonnegative_int("Enter shift2 (non-negative integer): ")
+    if len(sys.argv) == 1:
+        shift1 = _read_nonnegative_int("Enter shift1 (non-negative integer): ")
+        shift2 = _read_nonnegative_int("Enter shift2 (non-negative integer): ")
+    elif len(sys.argv) == 3:
+        try:
+            shift1 = int(sys.argv[1])
+            shift2 = int(sys.argv[2])
+            _validate_shifts(shift1, shift2)
+        except (TypeError, ValueError):
+            print("Usage: python cipher.py [shift1 shift2]")
+            print("Both shifts must be non-negative integers.")
+            return
+    else:
+        print("Usage: python cipher.py [shift1 shift2]")
+        return
 
     raw_path = "raw_text.txt"
     encrypted_path = "encrypted_text.txt"
@@ -153,6 +181,8 @@ def main():
         verify_files(raw_path, decrypted_path)
     except FileNotFoundError as e:
         print(f"Could not find file: {e.filename}. Make sure raw_text.txt is in the same folder as cipher.py.")
+    except OSError as e:
+        print(f"Could not process cipher files: {e}")
 
 if __name__ == "__main__":
     main()

@@ -368,7 +368,7 @@ def export_to_json(entries, output_path):
 
 def validate_expression(expression):
     """Quick validation of expression structure before full parsing."""
-    if not expression:
+    if not expression or not expression.strip():
         return False, "Empty expression"
     
     # Check balanced parentheses
@@ -473,6 +473,7 @@ def evaluate_file(input_path):
                 tokens, t = profile_operation("tokenize", tokenize, expression)
                 time_tokenize += t
             except ValueError:
+                cache[expression] = entry
                 entries.append(entry)
                 blocks.append(
                     "Input: " + entry["input"] + "\n"
@@ -491,6 +492,7 @@ def evaluate_file(input_path):
                 entry["tree"] = tree_to_string(tree)
             except (ValueError, IndexError):
                 entry["tree"] = "ERROR"
+                cache[expression] = entry
                 entries.append(entry)
                 blocks.append(
                     "Input: " + entry["input"] + "\n"
