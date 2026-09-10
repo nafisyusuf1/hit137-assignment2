@@ -8,38 +8,40 @@ Design notes (read this before you present it to your group):
 - Every character is classified once, by *what it is* (lowercase
   first/second half, uppercase first/second half, digit, other),
   and a different shift amount is applied depending on that class.
-- Because two different rules both act on the 26-letter lowercase
-  alphabet (a-n forward, o-z backward) and two different rules both
-  act on the 26-letter uppercase alphabet (A-M backward, N-Z
-  forward), decryption cannot simply "know" which rule produced a
-  given encrypted letter. Instead, decrypt_char() tries the
-  candidate that assumes the letter came from the first half; if
-  reversing that shift lands back inside the first half, it's the
-  right answer. Otherwise it falls back to the second-half rule.
-  This is the standard way to make a "two-branch" shift cipher like
-  this one reversible.
+- Each rule shifts within its own source range (a-n, o-z, A-M, or
+    N-Z), so encrypted characters never cross between ranges. This
+    keeps the two-branch cipher reversible without needing to guess
+    which rule produced an encrypted character.
 """
 
 ALPHABET_SIZE = 26
 DIGIT_SIZE = 10
+LOWER_FIRST_START = ord('a')
+LOWER_FIRST_SIZE = 14  # a-n
+LOWER_SECOND_START = ord('o')
+LOWER_SECOND_SIZE = 12  # o-z
+UPPER_FIRST_START = ord('A')
+UPPER_FIRST_SIZE = 13  # A-M
+UPPER_SECOND_START = ord('N')
+UPPER_SECOND_SIZE = 13  # N-Z
 
 
 def shift_char_encrypt(ch, shift1, shift2):
     """Apply the forward (encryption) rule to a single character."""
     if ch.islower():
         if 'a' <= ch <= 'n':
-            amount = (shift1 * shift2) % ALPHABET_SIZE
-            return chr((ord(ch) - ord('a') + amount) % ALPHABET_SIZE + ord('a'))
+            amount = (shift1 * shift2) % LOWER_FIRST_SIZE
+            return chr((ord(ch) - LOWER_FIRST_START + amount) % LOWER_FIRST_SIZE + LOWER_FIRST_START)
         else:  # o-z
-            amount = (shift1 + shift2) % ALPHABET_SIZE
-            return chr((ord(ch) - ord('a') - amount) % ALPHABET_SIZE + ord('a'))
+            amount = (shift1 + shift2) % LOWER_SECOND_SIZE
+            return chr((ord(ch) - LOWER_SECOND_START - amount) % LOWER_SECOND_SIZE + LOWER_SECOND_START)
     elif ch.isupper():
         if 'A' <= ch <= 'M':
-            amount = shift1 % ALPHABET_SIZE
-            return chr((ord(ch) - ord('A') - amount) % ALPHABET_SIZE + ord('A'))
+            amount = shift1 % UPPER_FIRST_SIZE
+            return chr((ord(ch) - UPPER_FIRST_START - amount) % UPPER_FIRST_SIZE + UPPER_FIRST_START)
         else:  # N-Z
-            amount = (shift2 ** 2) % ALPHABET_SIZE
-            return chr((ord(ch) - ord('A') + amount) % ALPHABET_SIZE + ord('A'))
+            amount = (shift2 ** 2) % UPPER_SECOND_SIZE
+            return chr((ord(ch) - UPPER_SECOND_START + amount) % UPPER_SECOND_SIZE + UPPER_SECOND_START)
     elif ch.isdigit():
         amount = (shift1 - shift2) % DIGIT_SIZE
         return chr((ord(ch) - ord('0') + amount) % DIGIT_SIZE + ord('0'))
@@ -50,19 +52,17 @@ def shift_char_encrypt(ch, shift1, shift2):
 def shift_char_decrypt(ch, shift1, shift2):
     """Apply the reverse (decryption) rule to a single character."""
     if ch.islower():
-        amount_first = (shift1 * shift2) % ALPHABET_SIZE
-        candidate_first = chr((ord(ch) - ord('a') - amount_first) % ALPHABET_SIZE + ord('a'))
-        if 'a' <= candidate_first <= 'n':
-            return candidate_first
-        amount_second = (shift1 + shift2) % ALPHABET_SIZE
-        return chr((ord(ch) - ord('a') + amount_second) % ALPHABET_SIZE + ord('a'))
+        if 'a' <= ch <= 'n':
+            amount = (shift1 * shift2) % LOWER_FIRST_SIZE
+            return chr((ord(ch) - LOWER_FIRST_START - amount) % LOWER_FIRST_SIZE + LOWER_FIRST_START)
+        amount = (shift1 + shift2) % LOWER_SECOND_SIZE
+        return chr((ord(ch) - LOWER_SECOND_START + amount) % LOWER_SECOND_SIZE + LOWER_SECOND_START)
     elif ch.isupper():
-        amount_first = shift1 % ALPHABET_SIZE
-        candidate_first = chr((ord(ch) - ord('A') + amount_first) % ALPHABET_SIZE + ord('A'))
-        if 'A' <= candidate_first <= 'M':
-            return candidate_first
-        amount_second = (shift2 ** 2) % ALPHABET_SIZE
-        return chr((ord(ch) - ord('A') - amount_second) % ALPHABET_SIZE + ord('A'))
+        if 'A' <= ch <= 'M':
+            amount = shift1 % UPPER_FIRST_SIZE
+            return chr((ord(ch) - UPPER_FIRST_START + amount) % UPPER_FIRST_SIZE + UPPER_FIRST_START)
+        amount = (shift2 ** 2) % UPPER_SECOND_SIZE
+        return chr((ord(ch) - UPPER_SECOND_START - amount) % UPPER_SECOND_SIZE + UPPER_SECOND_START)
     elif ch.isdigit():
         amount = (shift1 - shift2) % DIGIT_SIZE
         return chr((ord(ch) - ord('0') - amount) % DIGIT_SIZE + ord('0'))
