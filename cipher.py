@@ -160,30 +160,32 @@ def _read_nonnegative_int(prompt: str) -> int:
 
 def main():
     if len(sys.argv) == 2 and sys.argv[1] in ("-h", "--help"):
-        print("Usage: python cipher.py [shift1 shift2]")
-        print("Encrypts and decrypts raw_text.txt using two non-negative shifts.")
+        print("Usage: python cipher.py [shift1 shift2 [input_file]]")
+        print("Encrypts and decrypts a text file using two non-negative shifts.")
+        print("The optional input file defaults to raw_text.txt.")
         print("Without arguments, the shifts are requested interactively.")
         return
     if len(sys.argv) == 1:
         shift1 = _read_nonnegative_int("Enter shift1 (non-negative integer): ")
         shift2 = _read_nonnegative_int("Enter shift2 (non-negative integer): ")
-    elif len(sys.argv) == 3:
+    elif len(sys.argv) in (3, 4):
         try:
             shift1 = int(sys.argv[1])
             shift2 = int(sys.argv[2])
             _validate_shifts(shift1, shift2)
         except (TypeError, ValueError):
-            print("Usage: python cipher.py [shift1 shift2]")
+            print("Usage: python cipher.py [shift1 shift2 [input_file]]")
             print("Both shifts must be non-negative integers.")
             return
     else:
-        print("Usage: python cipher.py [shift1 shift2]")
+        print("Usage: python cipher.py [shift1 shift2 [input_file]]")
         return
 
     here = os.path.dirname(os.path.abspath(__file__))
-    raw_path = os.path.join(here, "raw_text.txt")
-    encrypted_path = os.path.join(here, "encrypted_text.txt")
-    decrypted_path = os.path.join(here, "decrypted_text.txt")
+    raw_path = os.path.abspath(sys.argv[3]) if len(sys.argv) == 4 else os.path.join(here, "raw_text.txt")
+    output_dir = os.path.dirname(raw_path)
+    encrypted_path = os.path.join(output_dir, "encrypted_text.txt")
+    decrypted_path = os.path.join(output_dir, "decrypted_text.txt")
 
     try:
         encrypt_file(shift1, shift2, raw_path, encrypted_path)
@@ -194,7 +196,7 @@ def main():
 
         verify_files(raw_path, decrypted_path)
     except FileNotFoundError as e:
-        print(f"Could not find file: {e.filename}. Make sure raw_text.txt is in the same folder as cipher.py.")
+        print(f"Could not find input file: {e.filename}")
     except OSError as e:
         print(f"Could not process cipher files: {e}")
 
