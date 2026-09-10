@@ -14,6 +14,7 @@ Design notes (read this before you present it to your group):
     which rule produced an encrypted character.
 """
 
+import os
 import sys
 
 
@@ -167,9 +168,10 @@ def main():
         print("Usage: python cipher.py [shift1 shift2]")
         return
 
-    raw_path = "raw_text.txt"
-    encrypted_path = "encrypted_text.txt"
-    decrypted_path = "decrypted_text.txt"
+    here = os.path.dirname(os.path.abspath(__file__))
+    raw_path = os.path.join(here, "raw_text.txt")
+    encrypted_path = os.path.join(here, "encrypted_text.txt")
+    decrypted_path = os.path.join(here, "decrypted_text.txt")
 
     try:
         encrypt_file(shift1, shift2, raw_path, encrypted_path)
