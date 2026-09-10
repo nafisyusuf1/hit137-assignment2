@@ -70,6 +70,16 @@ def shift_char_decrypt(ch, shift1, shift2):
         return ch
 
 
+def encrypt_text(text: str, shift1: int, shift2: int) -> str:
+    """Return encrypted text without requiring temporary files."""
+    return ''.join(shift_char_encrypt(ch, shift1, shift2) for ch in text)
+
+
+def decrypt_text(text: str, shift1: int, shift2: int) -> str:
+    """Return decrypted text without requiring temporary files."""
+    return ''.join(shift_char_decrypt(ch, shift1, shift2) for ch in text)
+
+
 def encrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) -> None:
     """Reads from input_path and writes encrypted content to output_path."""
     # newline='' stops Python's universal-newline translation from silently
@@ -77,7 +87,7 @@ def encrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) ->
     # and the spec says those must pass through unchanged.
     with open(input_path, 'r', encoding='utf-8', newline='') as f:
         content = f.read()
-    encrypted = ''.join(shift_char_encrypt(ch, shift1, shift2) for ch in content)
+    encrypted = encrypt_text(content, shift1, shift2)
     with open(output_path, 'w', encoding='utf-8', newline='') as f:
         f.write(encrypted)
 
@@ -86,7 +96,7 @@ def decrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) ->
     """Reads from input_path (the encrypted file) and writes the decrypted content to output_path."""
     with open(input_path, 'r', encoding='utf-8', newline='') as f:
         content = f.read()
-    decrypted = ''.join(shift_char_decrypt(ch, shift1, shift2) for ch in content)
+    decrypted = decrypt_text(content, shift1, shift2)
     with open(output_path, 'w', encoding='utf-8', newline='') as f:
         f.write(decrypted)
 

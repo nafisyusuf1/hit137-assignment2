@@ -457,6 +457,18 @@ def evaluate_file(input_path):
             entry = {"input": expression, "tree": "ERROR",
                      "tokens": "ERROR", "result": "ERROR"}
 
+            if not is_valid:
+                entry["tokens"] = "ERROR (" + validation_msg + ")"
+                cache[expression] = entry
+                entries.append(entry)
+                blocks.append(
+                    "Input: " + entry["input"] + "\n"
+                    + "Tree: " + entry["tree"] + "\n"
+                    + "Tokens: " + entry["tokens"] + "\n"
+                    + "Result: " + result_to_string(entry["result"])
+                )
+                continue
+
             try:
                 tokens, t = profile_operation("tokenize", tokenize, expression)
                 time_tokenize += t
