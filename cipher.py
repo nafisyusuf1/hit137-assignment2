@@ -134,6 +134,15 @@ def verify_files(original_path: str, decrypted_path: str) -> bool:
         print("  Check that the same shift1/shift2 values were used for encryption and decryption.")
     return success
 
+
+def process_files(shift1: int, shift2: int, raw_path: str,
+                  encrypted_path: str, decrypted_path: str) -> bool:
+    """Encrypt, decrypt, and verify a file round trip."""
+    encrypt_file(shift1, shift2, raw_path, encrypted_path)
+    decrypt_file(shift1, shift2, encrypted_path, decrypted_path)
+    return verify_files(raw_path, decrypted_path)
+
+
 def _read_nonnegative_int(prompt: str) -> int:
     """Keeps asking until the user types a valid non-negative integer."""
     while True:
