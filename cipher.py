@@ -103,7 +103,8 @@ def verify_files(original_path: str, decrypted_path: str) -> bool:
         print("Verification successful: decrypted text matches the original.")
     else:
         mismatches = sum(1 for a, b in zip(original, decrypted) if a != b)
-        first_index = next((i for i, (a, b) in enumerate(zip(original, decrypted)) if a != b), None)
+        mismatches += abs(len(original) - len(decrypted))
+        first_index = next((i for i, (a, b) in enumerate(zip(original, decrypted)) if a != b), min(len(original), len(decrypted)))
         print("Verification failed: decrypted text does NOT match the original.")
         print(f"  {mismatches} character(s) differ (first difference at position {first_index}).")
         print("  This happens when two different letters land on the same encrypted letter for this shift1/shift2 pair.")
