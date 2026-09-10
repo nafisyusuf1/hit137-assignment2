@@ -568,7 +568,11 @@ def main():
     try:
         results = evaluate_file(input_path)
     except FileNotFoundError:
-        print("Could not find input.txt. Place it next to evaluator.py and run again.")
+        print(f"Could not find input file: {input_path}")
+        print("Provide a valid file path or place input.txt next to evaluator.py.")
+        return
+    except OSError as error:
+        print(f"Could not read input file '{input_path}': {error}")
         return
     elapsed = time.time() - start
 
