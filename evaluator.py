@@ -583,9 +583,11 @@ def main():
         print(f"Could not read input file '{input_path}': {error}")
         return
     elapsed = time.time() - start
+    output_dir = os.path.dirname(os.path.abspath(input_path))
 
     print("Processed " + str(len(results)) + " expression(s).")
     print(f"Total execution time: {elapsed:.6f}s")
+    print(f"Output directory: {output_dir}")
     print("Output files:")
     print("  - output.txt (formatted results)")
     print("  - output.json (JSON results)")
