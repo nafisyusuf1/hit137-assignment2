@@ -152,6 +152,11 @@ def _read_nonnegative_int(prompt: str) -> int:
 
 
 def main():
+    if len(sys.argv) == 2 and sys.argv[1] in ("-h", "--help"):
+        print("Usage: python cipher.py [shift1 shift2]")
+        print("Encrypts and decrypts raw_text.txt using two non-negative shifts.")
+        print("Without arguments, the shifts are requested interactively.")
+        return
     if len(sys.argv) == 1:
         shift1 = _read_nonnegative_int("Enter shift1 (non-negative integer): ")
         shift2 = _read_nonnegative_int("Enter shift2 (non-negative integer): ")
