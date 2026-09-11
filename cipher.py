@@ -46,7 +46,7 @@ def _validate_character(ch: str) -> None:
         raise TypeError("ch must be a single character")
 
 
-def shift_char_encrypt(ch, shift1, shift2):
+def shift_char_encrypt(ch: str, shift1: int, shift2: int) -> str:
     """Apply the forward (encryption) rule to a single character."""
     _validate_character(ch)
     if 'a' <= ch <= 'n':
@@ -68,7 +68,7 @@ def shift_char_encrypt(ch, shift1, shift2):
         return ch
 
 
-def shift_char_decrypt(ch, shift1, shift2):
+def shift_char_decrypt(ch: str, shift1: int, shift2: int) -> str:
     """Apply the reverse (decryption) rule to a single character."""
     _validate_character(ch)
     if 'a' <= ch <= 'n':
@@ -173,7 +173,7 @@ def _read_nonnegative_int(prompt: str) -> int:
         return value
 
 
-def main():
+def main() -> int:
     if len(sys.argv) == 2 and sys.argv[1] in ("-h", "--help"):
         print("Usage: python cipher.py [shift1 shift2 [input_file]]")
         print("Encrypts and decrypts a text file using two non-negative shifts.")
