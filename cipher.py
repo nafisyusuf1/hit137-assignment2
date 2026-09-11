@@ -149,6 +149,10 @@ def process_files(shift1: int, shift2: int, raw_path: str,
                   encrypted_path: str, decrypted_path: str) -> bool:
     """Encrypt, decrypt, and verify a file round trip."""
     _validate_shifts(shift1, shift2)
+    paths = [os.path.normcase(os.path.abspath(path))
+             for path in (raw_path, encrypted_path, decrypted_path)]
+    if len(set(paths)) != len(paths):
+        raise ValueError("raw, encrypted, and decrypted paths must be different")
     encrypt_file(shift1, shift2, raw_path, encrypted_path)
     decrypt_file(shift1, shift2, encrypted_path, decrypted_path)
     return verify_files(raw_path, decrypted_path)
