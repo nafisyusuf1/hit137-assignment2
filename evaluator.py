@@ -359,10 +359,10 @@ def main():
         print("Usage: python evaluator.py [input_file]")
         print("Reads one mathematical expression per line.")
         print("Default input: input.txt next to evaluator.py")
-        return
+        return 0
     if len(sys.argv) > 2:
         print("Usage: python evaluator.py [input_file]")
-        return
+        return 2
     input_path = sys.argv[1] if len(sys.argv) == 2 else os.path.join(here, "input.txt")
 
     try:
@@ -370,15 +370,16 @@ def main():
     except FileNotFoundError:
         print(f"Could not find input file: {input_path}")
         print("Provide a valid file path or place input.txt next to evaluator.py.")
-        return
+        return 1
     except OSError as error:
         print(f"Could not read input file '{input_path}': {error}")
-        return
+        return 1
     output_dir = os.path.dirname(os.path.abspath(input_path))
 
     print("Processed " + str(len(results)) + " expression(s).")
     print(f"Output: {os.path.join(output_dir, 'output.txt')}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
