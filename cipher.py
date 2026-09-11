@@ -96,6 +96,7 @@ def decrypt_text(text: str, shift1: int, shift2: int) -> str:
 
 def encrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) -> None:
     """Reads from input_path and writes encrypted content to output_path."""
+    _validate_shifts(shift1, shift2)
     # newline='' stops Python's universal-newline translation from silently
     # turning \r\n into \n -- carriage returns are "other characters" too,
     # and the spec says those must pass through unchanged.
@@ -108,6 +109,7 @@ def encrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) ->
 
 def decrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) -> None:
     """Reads from input_path (the encrypted file) and writes the decrypted content to output_path."""
+    _validate_shifts(shift1, shift2)
     with open(input_path, 'r', encoding='utf-8', newline='') as f:
         content = f.read()
     decrypted = decrypt_text(content, shift1, shift2)
