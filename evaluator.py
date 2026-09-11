@@ -212,7 +212,7 @@ def parse_primary(tokens, pos):
 # 3. Formatting helpers
 # ---------------------------------------------------------------------------
 
-def format_value(value):
+def format_value(value) -> str:
     """Whole numbers print without a decimal point, otherwise rounded to
     up to 4 decimal places with no padded trailing zeros (e.g. 5.75, not
     5.7500; 33.3333 stays as-is)."""
@@ -223,7 +223,7 @@ def format_value(value):
     return text
 
 
-def tree_to_string(node):
+def tree_to_string(node) -> str:
     """Render a parse tree, e.g. '(+ 3 (* 4 5))' or '(neg (+ 3 4))'."""
     kind = node[0]
 
@@ -317,7 +317,7 @@ def evaluate_expression(expression: str) -> dict:
     return entry
 
 
-def result_to_string(result):
+def result_to_string(result) -> str:
     """Render the Result line value."""
     if isinstance(result, str):
         return "ERROR"
