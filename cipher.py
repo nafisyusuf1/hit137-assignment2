@@ -46,6 +46,12 @@ def _validate_character(ch: str) -> None:
         raise TypeError("ch must be a single character")
 
 
+def _validate_text(text: str) -> None:
+    """Reject values that cannot be processed as text."""
+    if not isinstance(text, str):
+        raise TypeError("text must be a string")
+
+
 def shift_char_encrypt(ch: str, shift1: int, shift2: int) -> str:
     """Apply the forward (encryption) rule to a single character."""
     _validate_character(ch)
@@ -92,12 +98,14 @@ def shift_char_decrypt(ch: str, shift1: int, shift2: int) -> str:
 
 def encrypt_text(text: str, shift1: int, shift2: int) -> str:
     """Return encrypted text without requiring temporary files."""
+    _validate_text(text)
     _validate_shifts(shift1, shift2)
     return ''.join(shift_char_encrypt(ch, shift1, shift2) for ch in text)
 
 
 def decrypt_text(text: str, shift1: int, shift2: int) -> str:
     """Return decrypted text without requiring temporary files."""
+    _validate_text(text)
     _validate_shifts(shift1, shift2)
     return ''.join(shift_char_decrypt(ch, shift1, shift2) for ch in text)
 
