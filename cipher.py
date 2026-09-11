@@ -40,8 +40,15 @@ def _validate_shifts(shift1: int, shift2: int) -> None:
         raise ValueError("shift values must be non-negative")
 
 
+def _validate_character(ch: str) -> None:
+    """Reject values that are not exactly one character long."""
+    if not isinstance(ch, str) or len(ch) != 1:
+        raise TypeError("ch must be a single character")
+
+
 def shift_char_encrypt(ch, shift1, shift2):
     """Apply the forward (encryption) rule to a single character."""
+    _validate_character(ch)
     if 'a' <= ch <= 'n':
         amount = (shift1 * shift2) % LOWER_FIRST_SIZE
         return chr((ord(ch) - LOWER_FIRST_START + amount) % LOWER_FIRST_SIZE + LOWER_FIRST_START)
@@ -63,6 +70,7 @@ def shift_char_encrypt(ch, shift1, shift2):
 
 def shift_char_decrypt(ch, shift1, shift2):
     """Apply the reverse (decryption) rule to a single character."""
+    _validate_character(ch)
     if 'a' <= ch <= 'n':
         amount = (shift1 * shift2) % LOWER_FIRST_SIZE
         return chr((ord(ch) - LOWER_FIRST_START - amount) % LOWER_FIRST_SIZE + LOWER_FIRST_START)
