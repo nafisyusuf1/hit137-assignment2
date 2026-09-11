@@ -30,8 +30,6 @@ Design notes
 
 import os
 import sys
-import time
-import json
 
 # Token type constants
 NUM = "NUM"
@@ -326,196 +324,19 @@ def result_to_string(result):
     return format_value(result)
 
 
-def gather_statistics(entries):
-    """Gather statistics about processing results."""
-    successful = sum(1 for e in entries if e["result"] != "ERROR")
-    errors = len(entries) - successful
-    avg_tree_depth = 0
-    
-    def get_tree_depth(tree_str):
-        """Estimate parse tree depth from string representation."""
-        if tree_str == "ERROR":
-            return 0
-        return tree_str.count("(")
-    
-    if successful > 0:
-        total_depth = sum(get_tree_depth(e["tree"]) for e in entries if e["tree"] != "ERROR")
-        avg_tree_depth = total_depth / successful
-    
-    return {
-        "total": len(entries),
-        "successful": successful,
-        "errors": errors,
-        "avg_tree_depth": avg_tree_depth
-    }
-
-
-def export_to_json(entries, output_path):
-    """Export results to JSON format."""
-    json_data = []
-    for entry in entries:
-        json_entry = {
-            "input": entry["input"],
-            "tokens": entry["tokens"],
-            "tree": entry["tree"],
-            "result": entry["result"] if entry["result"] == "ERROR" else float(entry["result"])
-        }
-        json_data.append(json_entry)
-    
-    with open(output_path, "w", encoding="utf-8") as handle:
-        json.dump(json_data, handle, indent=2)
-
-
-def validate_expression(expression):
-    """Quick validation of expression structure before full parsing."""
-    if not expression or not expression.strip():
-        return False, "Empty expression"
-    
-    # Check balanced parentheses
-    paren_count = 0
-    for ch in expression:
-        if ch == "(":
-            paren_count += 1
-        elif ch == ")":
-            paren_count -= 1
-            if paren_count < 0:
-                return False, "Unbalanced parentheses"
-    
-    if paren_count != 0:
-        return False, "Unbalanced parentheses"
-    
-    # Check for invalid character sequences
-    if "  " in expression:  # double space is not invalid, just checking
-        pass
-    
-    return True, "Valid"
-
-
-def generate_report(entries):
-    """Generate a detailed analysis report of results."""
-    report = {}
-    report["expressions_by_success"] = {"success": [], "error": []}
-    
-    for entry in entries:
-        if entry["result"] == "ERROR":
-            report["expressions_by_success"]["error"].append(entry["input"])
-        else:
-            report["expressions_by_success"]["success"].append({
-                "input": entry["input"],
-                "result": entry["result"]
-            })
-    
-    report["error_count"] = len(report["expressions_by_success"]["error"])
-    report["success_count"] = len(report["expressions_by_success"]["success"])
-    report["statistics"] = gather_statistics(entries)
-    
-    return report
-
-
-def profile_operation(func_name, func, *args, **kwargs):
-    """Profile a single operation and return result with timing."""
-    start = time.time()
-    result = func(*args, **kwargs)
-    elapsed = time.time() - start
-    return result, elapsed
-
-
 # ---------------------------------------------------------------------------
 # 6. Required public interface
 # ---------------------------------------------------------------------------
 
 def evaluate_file(input_path):
-    """Read expressions from input_path (one per line), write output.txt to
-    the same directory, and return a list of result dictionaries."""
-    start_time = time.time()
-    
+    """Evaluate one expression per line and write the required output blocks."""
     with open(input_path, "r", encoding="utf-8") as handle:
         lines = [line.strip() for line in handle]
 
     expressions = [line for line in lines if line != ""]
-
-    entries = []
+    entries = [evaluate_expression(expression) for expression in expressions]
     blocks = []
-    cache = {}
-    cache_hits = 0
-    validation_checks = 0
-    
-    # Performance tracking
-    time_tokenize = 0
-    time_parse = 0
-    time_evaluate = 0
-    time_format = 0
-    
-    for expression in expressions:
-        if expression in cache:
-            entry = cache[expression]
-            cache_hits += 1
-        else:
-            # Pre-validate before full evaluation
-            is_valid, validation_msg = validate_expression(expression)
-            validation_checks += 1
-            
-            entry = {"input": expression, "tree": "ERROR",
-                     "tokens": "ERROR", "result": "ERROR"}
-
-            if not is_valid:
-                entry["tokens"] = "ERROR (" + validation_msg + ")"
-                cache[expression] = entry
-                entries.append(entry)
-                blocks.append(
-                    "Input: " + entry["input"] + "\n"
-                    + "Tree: " + entry["tree"] + "\n"
-                    + "Tokens: " + entry["tokens"] + "\n"
-                    + "Result: " + result_to_string(entry["result"])
-                )
-                continue
-
-            try:
-                tokens, t = profile_operation("tokenize", tokenize, expression)
-                time_tokenize += t
-            except ValueError as error:
-                entry["tokens"] = "ERROR (" + str(error) + ")"
-                cache[expression] = entry
-                entries.append(entry)
-                blocks.append(
-                    "Input: " + entry["input"] + "\n"
-                    + "Tree: " + entry["tree"] + "\n"
-                    + "Tokens: " + entry["tokens"] + "\n"
-                    + "Result: " + result_to_string(entry["result"])
-                )
-                continue
-
-            entry["tokens"], t = profile_operation("tokens_to_string", tokens_to_string, tokens)
-            time_format += t
-
-            try:
-                tree, t = profile_operation("parse", parse, tokens)
-                time_parse += t
-                entry["tree"] = tree_to_string(tree)
-            except (ValueError, IndexError) as error:
-                entry["tree"] = "ERROR (" + str(error) + ")"
-                cache[expression] = entry
-                entries.append(entry)
-                blocks.append(
-                    "Input: " + entry["input"] + "\n"
-                    + "Tree: " + entry["tree"] + "\n"
-                    + "Tokens: " + entry["tokens"] + "\n"
-                    + "Result: " + result_to_string(entry["result"])
-                )
-                continue
-
-            try:
-                value, t = profile_operation("evaluate_tree", evaluate_tree, tree)
-                time_evaluate += t
-                if value != value or value in (float("inf"), float("-inf")):
-                    raise ValueError("non-finite result")
-                entry["result"] = value
-            except (ZeroDivisionError, ValueError, OverflowError):
-                entry["result"] = "ERROR"
-            
-            cache[expression] = entry
-        
-        entries.append(entry)
+    for entry in entries:
         blocks.append(
             "Input: " + entry["input"] + "\n"
             + "Tree: " + entry["tree"] + "\n"
@@ -523,40 +344,10 @@ def evaluate_file(input_path):
             + "Result: " + result_to_string(entry["result"])
         )
 
-    elapsed = time.time() - start_time
-    stats = gather_statistics(entries)
-    
     output_dir = os.path.dirname(os.path.abspath(input_path))
     output_path = os.path.join(output_dir, "output.txt")
-    json_path = os.path.join(output_dir, "output.json")
-    report_path = os.path.join(output_dir, "report.json")
-    
-    summary = (f"\n\nSummary:\n"
-               f"  Total expressions: {stats['total']}\n"
-               f"  Successful: {stats['successful']}\n"
-               f"  Errors: {stats['errors']}\n"
-               f"  Avg tree depth: {stats['avg_tree_depth']:.2f}\n"
-               f"  Unique expressions: {len(cache)}\n"
-               f"  Cache hits: {cache_hits}\n"
-               f"  Validations performed: {validation_checks}\n"
-               f"  Processing time: {elapsed:.6f}s\n"
-               f"\nTiming breakdown:\n"
-               f"  Tokenize: {time_tokenize:.6f}s\n"
-               f"  Format tokens: {time_format:.6f}s\n"
-               f"  Parse: {time_parse:.6f}s\n"
-               f"  Evaluate: {time_evaluate:.6f}s")
-    
     with open(output_path, "w", encoding="utf-8") as handle:
         handle.write("\n\n".join(blocks))
-        handle.write(summary)
-    
-    # Also export to JSON
-    export_to_json(entries, json_path)
-    
-    # Export detailed report
-    report = generate_report(entries)
-    with open(report_path, "w", encoding="utf-8") as handle:
-        json.dump(report, handle, indent=2)
 
     return entries
 
@@ -574,7 +365,6 @@ def main():
         return
     input_path = sys.argv[1] if len(sys.argv) == 2 else os.path.join(here, "input.txt")
 
-    start = time.time()
     try:
         results = evaluate_file(input_path)
     except FileNotFoundError:
@@ -584,16 +374,10 @@ def main():
     except OSError as error:
         print(f"Could not read input file '{input_path}': {error}")
         return
-    elapsed = time.time() - start
     output_dir = os.path.dirname(os.path.abspath(input_path))
 
     print("Processed " + str(len(results)) + " expression(s).")
-    print(f"Total execution time: {elapsed:.6f}s")
-    print(f"Output directory: {output_dir}")
-    print("Output files:")
-    print("  - output.txt (formatted results)")
-    print("  - output.json (JSON results)")
-    print("  - report.json (detailed report)")
+    print(f"Output: {os.path.join(output_dir, 'output.txt')}")
 
 
 if __name__ == "__main__":
