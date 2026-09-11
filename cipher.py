@@ -221,6 +221,9 @@ def main() -> int:
     except FileNotFoundError as e:
         print(f"Could not find input file: {e.filename}")
         return 1
+    except UnicodeError as e:
+        print(f"Could not decode cipher file as UTF-8: {e}")
+        return 1
     except OSError as e:
         print(f"Could not process cipher files: {e}")
         return 1
