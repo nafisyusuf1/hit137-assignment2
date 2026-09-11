@@ -179,7 +179,7 @@ def main():
         print("Encrypts and decrypts a text file using two non-negative shifts.")
         print("The optional input file defaults to raw_text.txt.")
         print("Without arguments, the shifts are requested interactively.")
-        return
+        return 0
     if len(sys.argv) == 1:
         shift1 = _read_nonnegative_int("Enter shift1 (non-negative integer): ")
         shift2 = _read_nonnegative_int("Enter shift2 (non-negative integer): ")
@@ -191,10 +191,10 @@ def main():
         except (TypeError, ValueError):
             print("Usage: python cipher.py [shift1 shift2 [input_file]]")
             print("Both shifts must be non-negative integers.")
-            return
+            return 2
     else:
         print("Usage: python cipher.py [shift1 shift2 [input_file]]")
-        return
+        return 2
 
     here = os.path.dirname(os.path.abspath(__file__))
     raw_path = os.path.abspath(sys.argv[3]) if len(sys.argv) == 4 else os.path.join(here, "raw_text.txt")
@@ -209,11 +209,13 @@ def main():
         decrypt_file(shift1, shift2, encrypted_path, decrypted_path)
         print(f"Decrypted '{encrypted_path}' -> '{decrypted_path}'")
 
-        verify_files(raw_path, decrypted_path)
+        return 0 if verify_files(raw_path, decrypted_path) else 1
     except FileNotFoundError as e:
         print(f"Could not find input file: {e.filename}")
+        return 1
     except OSError as e:
         print(f"Could not process cipher files: {e}")
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
