@@ -328,7 +328,7 @@ def result_to_string(result):
 # 6. Required public interface
 # ---------------------------------------------------------------------------
 
-def evaluate_file(input_path):
+def evaluate_file(input_path: str) -> list[dict]:
     """Evaluate one expression per line and write the required output blocks."""
     with open(input_path, "r", encoding="utf-8") as handle:
         lines = [line.strip() for line in handle]
