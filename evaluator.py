@@ -346,7 +346,7 @@ def evaluate_file(input_path: str) -> list[dict]:
 
     output_dir = os.path.dirname(os.path.abspath(input_path))
     output_path = os.path.join(output_dir, "output.txt")
-    with open(output_path, "w", encoding="utf-8") as handle:
+    with open(output_path, "w", encoding="utf-8", newline="") as handle:
         handle.write("\n\n".join(blocks))
 
     return entries
