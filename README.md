@@ -86,6 +86,19 @@ Tokens: [NUM:1] [OP:/] [NUM:0] [END]
 Result: ERROR
 ```
 
+## Contributions
+
+- **Nafis** — Created the GitHub repository and set up the project structure.
+  Wrote the initial implementation of `cipher.py` (Question 1). Added
+  documentation and basic test scripts (`test_cipher.py`, `test_evaluator.py`)
+  to verify both programs.
+- **Andrew & Hashir** — Developed `evaluator.py` (Question 2), including the
+  tokenizer, recursive-descent parser, and evaluator.
+- **Hashir** — Reviewed and fixed a bug in the cipher's shift logic, added
+  input validation and command-line argument support to `cipher.py`.
+
+All contributions are recorded in the commit history of this repository.
+
 
 
 
