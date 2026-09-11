@@ -287,7 +287,7 @@ def evaluate_tree(node):
 # 5. Per-expression driver
 # ---------------------------------------------------------------------------
 
-def evaluate_expression(expression):
+def evaluate_expression(expression: str) -> dict:
     """Process one expression and return its result dictionary."""
     entry = {"input": expression, "tree": "ERROR",
              "tokens": "ERROR", "result": "ERROR"}
@@ -352,7 +352,7 @@ def evaluate_file(input_path: str) -> list[dict]:
     return entries
 
 
-def main():
+def main() -> int:
     """Evaluate input.txt or a path supplied on the command line."""
     here = os.path.dirname(os.path.abspath(__file__))
     if len(sys.argv) == 2 and sys.argv[1] in ("-h", "--help"):
