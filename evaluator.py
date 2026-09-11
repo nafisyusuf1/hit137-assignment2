@@ -302,7 +302,7 @@ def evaluate_expression(expression):
     try:
         tree = parse(tokens)
         entry["tree"] = tree_to_string(tree)
-    except (ValueError, IndexError):
+    except (ValueError, IndexError, OverflowError):
         entry["tree"] = "ERROR"
         return entry
 
@@ -330,7 +330,7 @@ def result_to_string(result):
 
 def evaluate_file(input_path: str) -> list[dict]:
     """Evaluate one expression per line and write the required output blocks."""
-    with open(input_path, "r", encoding="utf-8") as handle:
+    with open(input_path, "r", encoding="utf-8-sig") as handle:
         lines = [line.strip() for line in handle]
 
     expressions = [line for line in lines if line != ""]
