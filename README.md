@@ -85,3 +85,23 @@ Tree: (/ 1 0)
 Tokens: [NUM:1] [OP:/] [NUM:0] [END]
 Result: ERROR
 ```
+
+
+
+## How to Run
+
+### Question 1 - Cipher
+Make sure `raw_text.txt` is in the same folder as `cipher.py`, then run:
+
+It will ask for `shift1` and `shift2` (both non-negative whole numbers), then
+automatically encrypt `raw_text.txt`, decrypt it back, and print whether the
+verification succeeded.
+
+You can also run it with the shifts as arguments:
+
+
+### Question 2 - Expression Evaluator
+Make sure `input.txt` (one expression per line) is in the same folder as
+`evaluator.py`, then run:
+
+This writes the results to `output.txt` in the same folder.
